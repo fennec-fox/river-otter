@@ -5,3 +5,10 @@ services:
     platform: linux/arm64/v8
     ports:
       - "27018:27017"
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: riverOtter

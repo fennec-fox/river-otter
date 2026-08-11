@@ -12,6 +12,7 @@ plugins {
     kotlin("plugin.noarg") version "1.9.22"
     kotlin("plugin.spring") version "1.9.22"
     kotlin("plugin.allopen") version "1.9.22"
+    kotlin("plugin.jpa") version "1.9.22"
     id("org.jmailen.kotlinter") version "3.14.0"
 }
 
@@ -52,6 +53,10 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    runtimeOnly("com.mysql:mysql-connector-j")
+    implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-mysql")
     implementation("org.springframework.boot:spring-boot-starter-web") {
         exclude(module = "spring-boot-starter-tomcat")
     }
@@ -65,6 +70,8 @@ dependencies {
         exclude(group = "junit", module = "junit")
     }
     testImplementation("org.springframework.boot:spring-boot-starter-hateoas")
+    testImplementation("org.testcontainers:junit-jupiter:1.19.3")
+    testImplementation("org.testcontainers:mysql:1.19.3")
 
 }
 

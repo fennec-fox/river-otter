@@ -20,10 +20,17 @@ server:
   port: 6400
 
 spring:
-  data:
-    mongodb:
-      uri: mongodb://localhost:27018
-      database: riverOtter
+  datasource:
+    url: jdbc:mysql://localhost:3307/riverOtter?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
   mvc:
     log-request-details: true
 

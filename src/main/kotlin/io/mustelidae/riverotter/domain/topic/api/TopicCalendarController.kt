@@ -4,7 +4,6 @@ import io.mustelidae.riverotter.common.AvailableCountry
 import io.mustelidae.riverotter.domain.topic.TopicInteraction
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.bson.types.ObjectId
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -29,7 +28,7 @@ class TopicCalendarController(
     ) {
         val locale = AvailableCountry.getLocale(country)
         request.run {
-            topicInteraction.addHoliday(ObjectId(id), locale, date, name, description)
+            topicInteraction.addHoliday(id, locale, date, name, description)
         }
     }
 
@@ -41,7 +40,7 @@ class TopicCalendarController(
         @PathVariable date: LocalDate,
     ) {
         val locale = AvailableCountry.getLocale(country)
-        topicInteraction.removeHoliday(ObjectId(id), locale, date)
+        topicInteraction.removeHoliday(id, locale, date)
     }
 
     @Operation(summary = "Add workdays to calendar.")
@@ -53,7 +52,7 @@ class TopicCalendarController(
     ) {
         val locale = AvailableCountry.getLocale(country)
         request.run {
-            topicInteraction.addWorkday(ObjectId(id), locale, date, name, type, description)
+            topicInteraction.addWorkday(id, locale, date, name, type, description)
         }
     }
 
@@ -65,6 +64,6 @@ class TopicCalendarController(
         @PathVariable date: LocalDate,
     ) {
         val locale = AvailableCountry.getLocale(country)
-        topicInteraction.removeWorkday(ObjectId(id), locale, date)
+        topicInteraction.removeWorkday(id, locale, date)
     }
 }

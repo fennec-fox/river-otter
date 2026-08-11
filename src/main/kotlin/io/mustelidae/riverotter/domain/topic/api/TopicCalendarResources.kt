@@ -39,7 +39,7 @@ class TopicCalendarResources {
         companion object {
             fun from(topicCalendar: TopicCalendar): Reply {
                 val locale = topicCalendar.locale
-                val holidays = topicCalendar.holidays.map { HolidayCalendarResources.Reply.HolidayOfCountry.from(it, locale) }
+                val holidays = topicCalendar.holidays.map { HolidayCalendarResources.Reply.HolidayOfCountry.from(it.toHoliday(), locale) }
                 val workdays = topicCalendar.workdays.map { WorkdayOfTopic.from(it, locale) }
 
                 return Reply(

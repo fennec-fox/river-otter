@@ -9,9 +9,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.3"
     id("com.avast.gradle.docker-compose") version "0.17.4"
     kotlin("jvm") version "1.9.22"
-    kotlin("plugin.noarg") version "1.9.22"
     kotlin("plugin.spring") version "1.9.22"
-    kotlin("plugin.allopen") version "1.9.22"
     kotlin("plugin.jpa") version "1.9.22"
     id("org.jmailen.kotlinter") version "3.14.0"
 }
@@ -40,8 +38,6 @@ dependencies {
 
     implementation("com.github.kittinunf.fuel:fuel:2.3.1")
 
-    testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.9.0")
-
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 
     testImplementation("io.mockk:mockk:1.13.7")
@@ -52,7 +48,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     runtimeOnly("com.mysql:mysql-connector-j")
     implementation("org.flywaydb:flyway-core")
@@ -74,16 +69,6 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:1.19.3")
     testImplementation("org.testcontainers:mysql:1.19.3")
 
-}
-
-allOpen {
-    annotation("jakarta.persistence.MappedSuperclass")
-    annotation("org.springframework.data.mongodb.core.mapping.Document")
-}
-
-noArg {
-    annotation("jakarta.persistence.MappedSuperclass")
-    annotation("org.springframework.data.mongodb.core.mapping.Document")
 }
 
 tasks.withType<Test> {

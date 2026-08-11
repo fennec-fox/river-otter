@@ -30,7 +30,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-    open-in-view: false
+    open-in-view: true
 
 springdoc:
   show-actuator: false
@@ -42,10 +42,6 @@ spring:
   config:
     activate:
       on-profile: embedded
-  data:
-    mongodb:
-      database: riverOtter
-      host: localhost
 
 app:
   available-countries: KR,US

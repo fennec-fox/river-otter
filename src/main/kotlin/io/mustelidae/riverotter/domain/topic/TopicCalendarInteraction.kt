@@ -1,9 +1,10 @@
 package io.mustelidae.riverotter.domain.topic
 
-import io.mustelidae.riverotter.domain.calendar.holiday.Holiday
 import io.mustelidae.riverotter.domain.topic.repository.TopicCalendarRepository
-import org.bson.types.ObjectId
+import io.mustelidae.riverotter.domain.topic.repository.TopicHolidayRepository
+import io.mustelidae.riverotter.domain.topic.repository.WorkdayRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.util.Locale
 
@@ -11,26 +12,33 @@ import java.util.Locale
 class TopicCalendarInteraction(
     private val topicCalendarFinder: TopicCalendarFinder,
     private val topicCalendarRepository: TopicCalendarRepository,
+    private val topicHolidayRepository: TopicHolidayRepository,
+    private val workdayRepository: WorkdayRepository,
 ) {
 
-    fun add(locale: Locale, year: Int): ObjectId {
+    @Transactional
+    fun add(topic: Topic, locale: Locale, year: Int): Long {
         val topicCalendar = TopicCalendar(locale, year)
-        return topicCalendarRepository.save(topicCalendar).id
+        topic.addBy(topicCalendar)
+        return topicCalendarRepository.save(topicCalendar).id!!
     }
 
-    fun remove(id: ObjectId) {
+    @Transactional
+    fun remove(id: Long) {
         topicCalendarRepository.deleteById(id)
     }
 
-    fun addHoliday(id: ObjectId, date: LocalDate, name: String, description: String? = null) {
+    @Transactional
+    fun addHoliday(id: Long, date: LocalDate, name: String, description: String? = null) {
         val topicCalendar = topicCalendarFinder.findOrThrow(id)
-        val holiday = Holiday(date, name, Holiday.Type.TOPIC_HOLIDAY, description)
+        val holiday = TopicHoliday(date, name, description)
 
         topicCalendar.addBy(holiday)
         topicCalendarRepository.save(topicCalendar)
     }
 
-    fun addWorkday(id: ObjectId, date: LocalDate, name: String, type: Workday.Type, description: String? = null) {
+    @Transactional
+    fun addWorkday(id: Long, date: LocalDate, name: String, type: Workday.Type, description: String? = null) {
         val topicCalendar = topicCalendarFinder.findOrThrow(id)
         val workday = Workday(date, name, type, description)
 
@@ -38,15 +46,21 @@ class TopicCalendarInteraction(
         topicCalendarRepository.save(topicCalendar)
     }
 
-    fun removeHoliday(id: ObjectId, date: LocalDate) {
+    @Transactional
+    fun removeHoliday(id: Long, date: LocalDate) {
         val topicCalendar = topicCalendarFinder.findOrThrow(id)
+        val holiday = topicCalendar.holidays.find { it.date == date } ?: return
+
         topicCalendar.removeHoliday(date)
-        topicCalendarRepository.save(topicCalendar)
+        topicHolidayRepository.delete(holiday)
     }
 
-    fun removeWorkday(id: ObjectId, date: LocalDate) {
+    @Transactional
+    fun removeWorkday(id: Long, date: LocalDate) {
         val topicCalendar = topicCalendarFinder.findOrThrow(id)
+        val workday = topicCalendar.workdays.find { it.date == date } ?: return
+
         topicCalendar.removeWorkDay(date)
-        topicCalendarRepository.save(topicCalendar)
+        workdayRepository.delete(workday)
     }
 }

@@ -3,57 +3,59 @@ package io.mustelidae.riverotter.domain.topic
 import io.mustelidae.riverotter.config.DataNotFoundException
 import io.mustelidae.riverotter.config.DuplicateDataException
 import io.mustelidae.riverotter.domain.topic.api.TopicResources
-import io.mustelidae.riverotter.domain.topic.repository.TopicRepository
-import org.bson.types.ObjectId
+import io.mustelidae.riverotter.domain.topic.repository.TopicWorkScheduleRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.DayOfWeek
 
 @Service
 class TopicWorkScheduleInteraction(
     private val topicFinder: TopicFinder,
-    private val topicRepository: TopicRepository,
+    private val topicWorkScheduleRepository: TopicWorkScheduleRepository,
 ) {
 
-    fun add(topicId: ObjectId, request: TopicResources.WorkSchedule) {
+    @Transactional
+    fun add(topicId: String, request: TopicResources.WorkSchedule) {
         val topic = topicFinder.findOrThrow(topicId)
-        if (topic.workSchedule != null) {
+        if (topicWorkScheduleRepository.findByTopicId(topicId) != null) {
             throw DuplicateDataException("The topic already has a schedule.")
         }
 
-        topic.workSchedule = WorkSchedule.from(request)
-        topicRepository.save(topic)
+        val schedule = TopicWorkSchedule.from(topic, request)
+        topicWorkScheduleRepository.save(schedule)
     }
 
+    @Transactional
     fun modify(
-        topicId: ObjectId,
+        topicId: String,
         dayOfWeek: DayOfWeek,
         request: TopicResources.WorkSchedule.Schedule,
     ) {
-        val topic = topicFinder.findOrThrow(topicId)
-        if (topic.workSchedule == null) {
-            throw DataNotFoundException("Please register your weekly schedule first.")
-        }
+        topicFinder.findOrThrow(topicId)
+        val schedule = topicWorkScheduleRepository.findByTopicId(topicId)
+            ?: throw DataNotFoundException("Please register your weekly schedule first.")
 
-        val workTime = WorkSchedule.WorkTime.from(request)
+        val workTime = TopicWorkSchedule.WorkTime.from(request)
 
         when (dayOfWeek) {
-            DayOfWeek.MONDAY -> topic.workSchedule!!.mon = workTime
-            DayOfWeek.TUESDAY -> topic.workSchedule!!.tue = workTime
-            DayOfWeek.WEDNESDAY -> topic.workSchedule!!.wed = workTime
-            DayOfWeek.THURSDAY -> topic.workSchedule!!.thu = workTime
-            DayOfWeek.FRIDAY -> topic.workSchedule!!.fri = workTime
-            DayOfWeek.SATURDAY -> topic.workSchedule!!.sat = workTime
-            DayOfWeek.SUNDAY -> topic.workSchedule!!.sun = workTime
+            DayOfWeek.MONDAY -> schedule.mon = workTime
+            DayOfWeek.TUESDAY -> schedule.tue = workTime
+            DayOfWeek.WEDNESDAY -> schedule.wed = workTime
+            DayOfWeek.THURSDAY -> schedule.thu = workTime
+            DayOfWeek.FRIDAY -> schedule.fri = workTime
+            DayOfWeek.SATURDAY -> schedule.sat = workTime
+            DayOfWeek.SUNDAY -> schedule.sun = workTime
         }
 
-        topicRepository.save(topic)
+        topicWorkScheduleRepository.save(schedule)
     }
 
+    @Transactional
     fun remove(
-        topicId: ObjectId,
+        topicId: String,
     ) {
-        val topic = topicFinder.findOrThrow(topicId)
-        topic.workSchedule = null
-        topicRepository.save(topic)
+        topicFinder.findOrThrow(topicId)
+        val schedule = topicWorkScheduleRepository.findByTopicId(topicId) ?: return
+        topicWorkScheduleRepository.delete(schedule)
     }
 }

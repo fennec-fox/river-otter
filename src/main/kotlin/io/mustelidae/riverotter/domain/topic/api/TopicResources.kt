@@ -1,6 +1,7 @@
 package io.mustelidae.riverotter.domain.topic.api
 
 import io.mustelidae.riverotter.domain.topic.Topic
+import io.mustelidae.riverotter.domain.topic.TopicWorkSchedule
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -41,10 +42,10 @@ class TopicResources {
         val workSchedule: WorkSchedule? = null,
     ) {
         companion object {
-            fun from(topic: Topic): Reply {
+            fun from(topic: Topic, workSchedule: TopicWorkSchedule? = null): Reply {
                 return topic.run {
                     Reply(
-                        id.toString(),
+                        id,
                         name,
                         createdAt,
                         workSchedule?.let {
@@ -116,8 +117,8 @@ class TopicResources {
         )
 
         companion object {
-            fun from(topic: Topic): ReplyWithCalendar {
-                val reply = Reply.from(topic)
+            fun from(topic: Topic, workSchedule: TopicWorkSchedule? = null): ReplyWithCalendar {
+                val reply = Reply.from(topic, workSchedule)
                 val calendars = topic.calendars.map { TopicCalendarResources.Reply.from(it) }
                 return ReplyWithCalendar(
                     reply,

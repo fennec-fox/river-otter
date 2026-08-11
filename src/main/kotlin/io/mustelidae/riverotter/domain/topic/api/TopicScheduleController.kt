@@ -6,7 +6,6 @@ import io.mustelidae.riverotter.utils.toReply
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.bson.types.ObjectId
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -29,8 +28,7 @@ class TopicScheduleController(
         @PathVariable id: String,
         @RequestBody request: TopicResources.WorkSchedule,
     ): Reply<Unit> {
-        val topicId = ObjectId(id)
-        topicWorkScheduleInteraction.add(topicId, request)
+        topicWorkScheduleInteraction.add(id, request)
         return Unit.toReply()
     }
 
@@ -43,10 +41,9 @@ class TopicScheduleController(
         dayOfWeek: String,
         @RequestBody request: TopicResources.WorkSchedule.Schedule,
     ): Reply<Unit> {
-        val topicId = ObjectId(id)
         val dow = DayOfWeek.valueOf(dayOfWeek.uppercase())
 
-        topicWorkScheduleInteraction.modify(topicId, dow, request)
+        topicWorkScheduleInteraction.modify(id, dow, request)
         return Unit.toReply()
     }
 
@@ -55,8 +52,7 @@ class TopicScheduleController(
     fun remove(
         @PathVariable id: String,
     ): Reply<Unit> {
-        val topicId = ObjectId(id)
-        topicWorkScheduleInteraction.remove(topicId)
+        topicWorkScheduleInteraction.remove(id)
         return Unit.toReply()
     }
 }

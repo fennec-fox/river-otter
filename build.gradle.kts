@@ -90,6 +90,9 @@ tasks.withType<Test> {
     useJUnitPlatform()
     failFast = true
 
+    // docker-java in this Testcontainers line negotiates down to API 1.32, which Docker Engine 29+ rejects.
+    systemProperty("api.version", "1.44")
+
     testLogging {
         events.plus(TestLogEvent.FAILED)
         events.plus(TestLogEvent.STANDARD_ERROR)

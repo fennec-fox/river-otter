@@ -1,12 +1,21 @@
 package io.mustelidae.riverotter.domain.calendar.holiday.repository
 
 import io.mustelidae.riverotter.domain.calendar.holiday.HolidayCalendar
-import org.bson.types.ObjectId
-import org.springframework.data.mongodb.repository.MongoRepository
+import org.springframework.data.jpa.repository.EntityGraph
+import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import java.util.Locale
 
 @Repository
-interface HolidayCalendarRepository : MongoRepository<HolidayCalendar, ObjectId> {
+interface HolidayCalendarRepository : JpaRepository<HolidayCalendar, Long> {
+
+    @EntityGraph(attributePaths = ["holidays"])
     fun findByYearAndLocale(year: Int, locale: Locale): HolidayCalendar?
+
+    fun findAllByLocale(locale: Locale): List<YearOfCalendar>
+
+    interface YearOfCalendar {
+        val id: Long
+        val year: Int
+    }
 }

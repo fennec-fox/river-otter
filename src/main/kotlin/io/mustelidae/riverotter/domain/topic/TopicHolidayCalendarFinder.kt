@@ -31,7 +31,7 @@ class TopicHolidayCalendarFinder(
             holidaySynchronization.syncTopicCalendar(it)
         }
 
-        return HolidayCalendar(locale, year, holidaySynchronization.getHolidays())
+        return HolidayCalendar.virtualOf(locale, year, holidaySynchronization.getHolidays())
     }
 
     fun findBy(id: ObjectId, locale: Locale, year: Int, month: Int): List<Holiday> {

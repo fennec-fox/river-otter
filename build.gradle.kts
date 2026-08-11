@@ -70,6 +70,7 @@ dependencies {
         exclude(group = "junit", module = "junit")
     }
     testImplementation("org.springframework.boot:spring-boot-starter-hateoas")
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:junit-jupiter:1.19.3")
     testImplementation("org.testcontainers:mysql:1.19.3")
 

@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.MockMvc
 @ActiveProfiles("embedded")
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(classes = [RiverOtterApplication::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ContextConfiguration(classes = [DefaultEmbeddedMongo::class])
+@ContextConfiguration(classes = [DefaultEmbeddedMongo::class, MySqlContainerConfig::class])
 @AutoConfigureMockMvc
 class FlowTestSupport {
 

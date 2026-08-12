@@ -11,6 +11,7 @@ plugins {
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.spring") version "1.9.22"
     kotlin("plugin.jpa") version "1.9.22"
+    kotlin("kapt") version "1.9.22"
     id("org.jmailen.kotlinter") version "3.14.0"
 }
 
@@ -26,7 +27,12 @@ repositories {
 
 ext["log4j2.version"] = "2.17.1"
 
+val queryDslVersion = "5.0.0"
+
 dependencies {
+    implementation("com.querydsl:querydsl-jpa:$queryDslVersion:jakarta")
+    kapt("com.querydsl:querydsl-apt:$queryDslVersion:jakarta")
+
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
 

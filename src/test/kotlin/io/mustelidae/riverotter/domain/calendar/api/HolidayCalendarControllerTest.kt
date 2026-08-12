@@ -5,7 +5,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mustelidae.riverotter.common.AvailableCountry
 import io.mustelidae.riverotter.config.IntegrationSupport
-import io.mustelidae.riverotter.domain.calendar.holiday.repository.HolidayCalendarRepository
+import io.mustelidae.riverotter.domain.calendar.holiday.repository.HolidayCalendarDSLRepository
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
@@ -19,7 +19,7 @@ internal class HolidayCalendarControllerTest : IntegrationSupport() {
     private lateinit var holidayCalendarController: HolidayCalendarController
 
     @Autowired
-    private lateinit var holidayCalenderRepository: HolidayCalendarRepository
+    private lateinit var holidayCalendarDSLRepository: HolidayCalendarDSLRepository
 
     private val year = 2020
 
@@ -40,7 +40,7 @@ internal class HolidayCalendarControllerTest : IntegrationSupport() {
         for (yearOfCountry in yearOfCountries) {
             yearOfCountry.id
 
-            val calendar = holidayCalenderRepository.findByYearAndLocale(yearOfCountry.year, AvailableCountry.getLocale(yearOfCountry.country))
+            val calendar = holidayCalendarDSLRepository.findByYearAndLocale(yearOfCountry.year, AvailableCountry.getLocale(yearOfCountry.country))
 
             calendar shouldNotBe null
             calendar!!.holidays.size shouldBeGreaterThan 0

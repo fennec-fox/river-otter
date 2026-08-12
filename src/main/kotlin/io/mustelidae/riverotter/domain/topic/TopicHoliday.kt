@@ -4,6 +4,7 @@ import io.mustelidae.riverotter.domain.calendar.holiday.Holiday
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -27,7 +28,7 @@ class TopicHoliday(
     @Enumerated(EnumType.STRING)
     val type: Holiday.Type = Holiday.Type.TOPIC_HOLIDAY
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topicCalendarId")
     var topicCalendar: TopicCalendar? = null
         protected set

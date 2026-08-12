@@ -26,7 +26,7 @@ class TopicCalendar(
     var id: Long? = null
         protected set
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topicId")
     var topic: Topic? = null
         protected set

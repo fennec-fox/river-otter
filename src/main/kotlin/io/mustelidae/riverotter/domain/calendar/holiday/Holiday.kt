@@ -3,6 +3,7 @@ package io.mustelidae.riverotter.domain.calendar.holiday
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -26,7 +27,7 @@ class Holiday(
     var id: Long? = null
         protected set
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "holidayCalendarId")
     var holidayCalendar: HolidayCalendar? = null
         protected set

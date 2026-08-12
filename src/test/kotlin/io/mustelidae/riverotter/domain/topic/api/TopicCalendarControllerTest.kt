@@ -7,7 +7,7 @@ import io.mustelidae.riverotter.config.IntegrationSupport
 import io.mustelidae.riverotter.domain.topic.Topic
 import io.mustelidae.riverotter.domain.topic.Workday
 import io.mustelidae.riverotter.domain.topic.aFixture
-import io.mustelidae.riverotter.domain.topic.repository.TopicCalendarRepository
+import io.mustelidae.riverotter.domain.topic.repository.TopicCalendarDSLRepository
 import io.mustelidae.riverotter.domain.topic.repository.TopicRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.MethodOrderer
@@ -30,7 +30,7 @@ internal class TopicCalendarControllerTest : IntegrationSupport() {
     private lateinit var topicRepository: TopicRepository
 
     @Autowired
-    private lateinit var topicCalendarRepository: TopicCalendarRepository
+    private lateinit var topicCalendarDSLRepository: TopicCalendarDSLRepository
 
     private val country = "KR"
     private val year = 2020
@@ -58,7 +58,7 @@ internal class TopicCalendarControllerTest : IntegrationSupport() {
         topicCalendarController.addHoliday(topicId, country, request)
 
         // Then
-        val calendar = topicCalendarRepository.findWithHolidaysByTopicIdAndLocaleAndYear(topicId, locale, year)!!
+        val calendar = topicCalendarDSLRepository.findWithHolidaysByTopicIdAndLocaleAndYear(topicId, locale, year)!!
         calendar.holidays.size shouldBe 1
         calendar.holidays.first().date shouldBe request.date
         calendar.createdAt shouldNotBe null
@@ -76,7 +76,7 @@ internal class TopicCalendarControllerTest : IntegrationSupport() {
         // Then
         // holidays/workdays live on the mappedBy (child) side, so mutating them never
         // dirties the topic_calendar row itself, and modifiedAt must stay unchanged.
-        val calendar = topicCalendarRepository.findWithHolidaysByTopicIdAndLocaleAndYear(topicId, locale, year)!!
+        val calendar = topicCalendarDSLRepository.findWithHolidaysByTopicIdAndLocaleAndYear(topicId, locale, year)!!
         calendar.holidays.size shouldBe 0
         calendar.modifiedAt shouldBe modifiedAtAfterCreate
     }
@@ -101,7 +101,7 @@ internal class TopicCalendarControllerTest : IntegrationSupport() {
         topicCalendarController.removeWorkday(topicId, country, date)
 
         // Then
-        val calendar = topicCalendarRepository.findWithWorkdaysByTopicIdAndLocaleAndYear(topicId, locale, year)!!
+        val calendar = topicCalendarDSLRepository.findWithWorkdaysByTopicIdAndLocaleAndYear(topicId, locale, year)!!
         calendar.workdays.size shouldBe 0
     }
 }

@@ -2,6 +2,7 @@ package io.mustelidae.riverotter.domain.calendar.holiday.country
 
 import io.mustelidae.riverotter.domain.calendar.holiday.Holiday
 import io.mustelidae.riverotter.domain.calendar.holiday.HolidayCalendar
+import io.mustelidae.riverotter.domain.calendar.holiday.repository.HolidayCalendarDSLRepository
 import io.mustelidae.riverotter.domain.calendar.holiday.repository.HolidayCalendarRepository
 import io.mustelidae.riverotter.domain.client.abstractapi.WorldHolidayClient
 import kotlinx.coroutines.Dispatchers
@@ -13,11 +14,12 @@ import java.util.Locale
 class UnitedStateHoliday(
     private val worldHolidayClient: WorldHolidayClient,
     private val holidayCalendarRepository: HolidayCalendarRepository,
+    private val holidayCalendarDSLRepository: HolidayCalendarDSLRepository,
 ) : CountryHoliday {
     override val localeOfCountry: Locale = Locale.US
 
     override fun create(year: Int): Long {
-        val holidayCalendar = holidayCalendarRepository.findByYearAndLocale(year, localeOfCountry)
+        val holidayCalendar = holidayCalendarDSLRepository.findByYearAndLocale(year, localeOfCountry)
         if (holidayCalendar != null) {
             return holidayCalendar.id!!
         }

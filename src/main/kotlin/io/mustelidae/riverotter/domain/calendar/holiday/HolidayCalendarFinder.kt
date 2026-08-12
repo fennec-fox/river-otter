@@ -1,15 +1,17 @@
 package io.mustelidae.riverotter.domain.calendar.holiday
 
 import io.mustelidae.riverotter.config.DataNotFoundException
-import io.mustelidae.riverotter.domain.calendar.holiday.repository.HolidayCalendarRepository
+import io.mustelidae.riverotter.domain.calendar.holiday.repository.HolidayCalendarDSLRepository
 import io.mustelidae.riverotter.utils.searchIndex
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.util.Locale
 
 @Service
+@Transactional(readOnly = true)
 class HolidayCalendarFinder(
-    private val holidayCalendarRepository: HolidayCalendarRepository,
+    private val holidayCalendarDSLRepository: HolidayCalendarDSLRepository,
 ) {
 
     fun findBy(locale: Locale, year: Int, month: Int): List<Holiday> {
@@ -29,6 +31,6 @@ class HolidayCalendarFinder(
     }
 
     fun findOrThrow(locale: Locale, year: Int): HolidayCalendar {
-        return holidayCalendarRepository.findByYearAndLocale(year, locale) ?: throw DataNotFoundException("$locale ($year) is not found")
+        return holidayCalendarDSLRepository.findByYearAndLocale(year, locale) ?: throw DataNotFoundException("$locale ($year) is not found")
     }
 }

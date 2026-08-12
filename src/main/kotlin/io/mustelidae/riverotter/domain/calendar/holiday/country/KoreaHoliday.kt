@@ -3,6 +3,7 @@ package io.mustelidae.riverotter.domain.calendar.holiday.country
 import io.mustelidae.riverotter.config.AppEnvironment
 import io.mustelidae.riverotter.domain.calendar.holiday.Holiday
 import io.mustelidae.riverotter.domain.calendar.holiday.HolidayCalendar
+import io.mustelidae.riverotter.domain.calendar.holiday.repository.HolidayCalendarDSLRepository
 import io.mustelidae.riverotter.domain.calendar.holiday.repository.HolidayCalendarRepository
 import io.mustelidae.riverotter.domain.client.korea.government.GovernmentOpenClient
 import io.mustelidae.riverotter.utils.sort
@@ -14,6 +15,7 @@ class KoreaHoliday(
     korEnv: AppEnvironment.Country.Korea,
     private val governmentOpenClient: GovernmentOpenClient,
     private val holidayCalendarRepository: HolidayCalendarRepository,
+    private val holidayCalendarDSLRepository: HolidayCalendarDSLRepository,
 ) : CountryHoliday {
 
     override val localeOfCountry: Locale = Locale.KOREA
@@ -21,7 +23,7 @@ class KoreaHoliday(
     private val saturdayIsHoliday = korEnv.saturdayIsHoliday
 
     override fun create(year: Int): Long {
-        val holidayCalendar = holidayCalendarRepository.findByYearAndLocale(year, localeOfCountry)
+        val holidayCalendar = holidayCalendarDSLRepository.findByYearAndLocale(year, localeOfCountry)
         if (holidayCalendar != null) {
             return holidayCalendar.id!!
         }

@@ -42,6 +42,7 @@ dependencies {
 
     testImplementation("io.mockk:mockk:1.13.7")
     testImplementation("io.kotest:kotest-runner-junit5-jvm:5.1.0")
+    testImplementation("com.h2database:h2")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
@@ -65,18 +66,12 @@ dependencies {
         exclude(group = "junit", module = "junit")
     }
     testImplementation("org.springframework.boot:spring-boot-starter-hateoas")
-    testImplementation("org.springframework.boot:spring-boot-testcontainers")
-    testImplementation("org.testcontainers:junit-jupiter:1.19.3")
-    testImplementation("org.testcontainers:mysql:1.19.3")
 
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
     failFast = true
-
-    // docker-java in this Testcontainers line negotiates down to API 1.32, which Docker Engine 29+ rejects.
-    systemProperty("api.version", "1.44")
 
     testLogging {
         events.plus(TestLogEvent.FAILED)

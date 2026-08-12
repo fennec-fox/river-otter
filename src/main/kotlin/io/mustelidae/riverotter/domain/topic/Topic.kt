@@ -1,12 +1,12 @@
 package io.mustelidae.riverotter.domain.topic
 
+import io.mustelidae.riverotter.common.Audit
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
 import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
-import java.time.LocalDateTime
 import java.util.Locale
 
 @Entity
@@ -15,10 +15,7 @@ class Topic(
     @Id
     var id: String,
     val name: String,
-) {
-    var createdAt: LocalDateTime = LocalDateTime.now()
-        protected set
-
+) : Audit() {
     @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     var calendars: MutableList<TopicCalendar> = arrayListOf()
         protected set

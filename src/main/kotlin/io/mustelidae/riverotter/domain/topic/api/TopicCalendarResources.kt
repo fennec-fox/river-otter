@@ -46,8 +46,8 @@ class TopicCalendarResources {
                     topicCalendar.id.toString(),
                     locale,
                     topicCalendar.year,
-                    topicCalendar.createdAt,
-                    topicCalendar.modifiedAt,
+                    topicCalendar.createdAt!!,
+                    topicCalendar.modifiedAt!!,
                     holidays,
                     workdays,
                 )

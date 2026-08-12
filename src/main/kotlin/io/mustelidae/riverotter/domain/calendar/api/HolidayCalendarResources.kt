@@ -53,7 +53,7 @@ class HolidayCalendarResources {
             val country: String,
             val year: Int,
             val holidays: List<HolidayOfCountry>,
-            val createdAt: LocalDateTime,
+            val createdAt: LocalDateTime?,
         ) {
             companion object {
                 fun from(holidayCalendar: HolidayCalendar): Calendar {

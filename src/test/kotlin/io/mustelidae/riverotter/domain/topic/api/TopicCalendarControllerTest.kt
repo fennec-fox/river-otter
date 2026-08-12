@@ -1,6 +1,7 @@
 package io.mustelidae.riverotter.domain.topic.api
 
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mustelidae.riverotter.common.AvailableCountry
 import io.mustelidae.riverotter.config.IntegrationSupport
 import io.mustelidae.riverotter.domain.topic.Topic
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestMethodOrder
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -34,6 +36,7 @@ internal class TopicCalendarControllerTest : IntegrationSupport() {
     private val year = 2020
     private val locale = AvailableCountry.getLocale(country)
     private lateinit var topicId: String
+    private lateinit var modifiedAtAfterCreate: LocalDateTime
 
     @BeforeAll()
     fun beforeAll() {
@@ -58,6 +61,10 @@ internal class TopicCalendarControllerTest : IntegrationSupport() {
         val calendar = topicCalendarRepository.findWithHolidaysByTopicIdAndLocaleAndYear(topicId, locale, year)!!
         calendar.holidays.size shouldBe 1
         calendar.holidays.first().date shouldBe request.date
+        calendar.createdAt shouldNotBe null
+        calendar.modifiedAt shouldNotBe null
+        calendar.auditor shouldBe "unknown"
+        modifiedAtAfterCreate = calendar.modifiedAt!!
     }
 
     @Test
@@ -67,8 +74,11 @@ internal class TopicCalendarControllerTest : IntegrationSupport() {
         topicCalendarController.removeHoliday(topicId, country, date)
 
         // Then
+        // holidays/workdays live on the mappedBy (child) side, so mutating them never
+        // dirties the topic_calendar row itself, and modifiedAt must stay unchanged.
         val calendar = topicCalendarRepository.findWithHolidaysByTopicIdAndLocaleAndYear(topicId, locale, year)!!
         calendar.holidays.size shouldBe 0
+        calendar.modifiedAt shouldBe modifiedAtAfterCreate
     }
 
     @Test

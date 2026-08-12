@@ -47,7 +47,7 @@ class TopicResources {
                     Reply(
                         id,
                         name,
-                        createdAt,
+                        createdAt!!,
                         workSchedule?.let {
                             WorkSchedule(
                                 WorkSchedule.Schedule(

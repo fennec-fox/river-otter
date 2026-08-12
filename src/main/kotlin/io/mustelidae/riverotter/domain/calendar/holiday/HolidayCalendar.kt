@@ -1,5 +1,6 @@
 package io.mustelidae.riverotter.domain.calendar.holiday
 
+import io.mustelidae.riverotter.common.Audit
 import io.mustelidae.riverotter.common.Error
 import io.mustelidae.riverotter.common.ErrorCode
 import io.mustelidae.riverotter.config.HumanException
@@ -13,7 +14,6 @@ import jakarta.persistence.OneToMany
 import jakarta.persistence.OrderBy
 import jakarta.persistence.Table
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.Locale
 
 @Entity
@@ -21,13 +21,10 @@ import java.util.Locale
 class HolidayCalendar(
     val locale: Locale,
     val year: Int,
-) {
+) : Audit() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
-        protected set
-
-    var createdAt: LocalDateTime = LocalDateTime.now()
         protected set
 
     @OneToMany(mappedBy = "holidayCalendar", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])

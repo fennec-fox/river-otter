@@ -1,5 +1,6 @@
 package io.mustelidae.riverotter.domain.topic
 
+import io.mustelidae.riverotter.common.Audit
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -12,7 +13,6 @@ import jakarta.persistence.OneToMany
 import jakarta.persistence.OrderBy
 import jakarta.persistence.Table
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.Locale
 
 @Entity
@@ -20,7 +20,7 @@ import java.util.Locale
 class TopicCalendar(
     val locale: Locale,
     val year: Int,
-) {
+) : Audit() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
@@ -41,12 +41,6 @@ class TopicCalendar(
     var workdays: MutableList<Workday> = arrayListOf()
         protected set
 
-    var createdAt: LocalDateTime = LocalDateTime.now()
-        protected set
-
-    var modifiedAt: LocalDateTime = LocalDateTime.now()
-        protected set
-
     fun setBy(topic: Topic) {
         this.topic = topic
         if (!topic.calendars.contains(this)) {
@@ -63,7 +57,6 @@ class TopicCalendar(
         if (this != holiday.topicCalendar) {
             holiday.setBy(this)
         }
-        modifiedAt = LocalDateTime.now()
     }
 
     fun addBy(workday: Workday) {
@@ -75,17 +68,14 @@ class TopicCalendar(
         if (this != workday.topicCalendar) {
             workday.setBy(this)
         }
-        modifiedAt = LocalDateTime.now()
     }
 
     fun removeHoliday(date: LocalDate) {
         holidays.removeIf { it.date == date }
-        modifiedAt = LocalDateTime.now()
     }
 
     fun removeWorkDay(date: LocalDate) {
         workdays.removeIf { it.date == date }
-        modifiedAt = LocalDateTime.now()
     }
 
     companion object

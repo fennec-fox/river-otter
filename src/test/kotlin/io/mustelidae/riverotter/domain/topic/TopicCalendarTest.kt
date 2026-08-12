@@ -1,7 +1,6 @@
 package io.mustelidae.riverotter.domain.topic
 
 import io.kotest.matchers.shouldBe
-import io.mustelidae.riverotter.domain.calendar.holiday.Holiday
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -13,7 +12,7 @@ internal class TopicCalendarTest {
     fun addBy() {
         // Given
         val topicCalendar = TopicCalendar.aFixture()
-        val holiday = Holiday(LocalDate.of(2020, 10, 6), "test", Holiday.Type.TOPIC_HOLIDAY)
+        val holiday = TopicHoliday(LocalDate.of(2020, 10, 6), "test")
         // When
         topicCalendar.addBy(holiday)
         // Then
@@ -73,10 +72,9 @@ internal fun TopicCalendar.Companion.aFixture(
         2020,
     ).apply {
         addBy(
-            Holiday(
+            TopicHoliday(
                 LocalDate.of(2020, 9, 29),
                 "vacation",
-                Holiday.Type.TOPIC_HOLIDAY,
             ),
         )
 

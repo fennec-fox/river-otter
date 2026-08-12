@@ -1,9 +1,9 @@
 package io.mustelidae.riverotter.domain.topic
 
-import org.bson.types.ObjectId
+import java.util.UUID
 
 internal class TopicTest
 
 fun Topic.Companion.aFixture(): Topic {
-    return Topic(ObjectId(), "Local test topic")
+    return Topic(UUID.randomUUID().toString(), "Local test topic")
 }

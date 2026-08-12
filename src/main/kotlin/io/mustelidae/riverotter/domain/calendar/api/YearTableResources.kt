@@ -1,8 +1,9 @@
 package io.mustelidae.riverotter.domain.calendar.api
 
-import io.mustelidae.riverotter.domain.calendar.yeartable.YearTable
+import io.mustelidae.riverotter.domain.calendar.holiday.repository.HolidayCalendarRepository
 import io.swagger.v3.oas.annotations.media.Schema
 import java.util.Locale
+import java.util.UUID
 
 class YearTableResources {
 
@@ -21,22 +22,23 @@ class YearTableResources {
                 var calendarId: String,
             ) {
                 companion object {
-                    fun from(yearOfLocale: YearTable.YearOfLocale): Year {
+                    fun from(yearOfCalendar: HolidayCalendarRepository.YearOfCalendar): Year {
                         return Year(
-                            yearOfLocale.year,
-                            yearOfLocale.id.toString(),
+                            yearOfCalendar.year,
+                            yearOfCalendar.id.toString(),
                         )
                     }
                 }
             }
 
             companion object {
-                fun from(yearTable: YearTable): Table {
-                    val years = yearTable.yearsOfLocale
-                        .map { Year.from(it) }
+                fun from(locale: Locale, yearsOfCalendar: List<HolidayCalendarRepository.YearOfCalendar>): Table {
+                    val years = yearsOfCalendar.map { Year.from(it) }
+                    val id = UUID.nameUUIDFromBytes(locale.country.toByteArray())
+
                     return Table(
-                        yearTable.id.toString(),
-                        yearTable.locale,
+                        id.toString(),
+                        locale,
                         years,
                     )
                 }

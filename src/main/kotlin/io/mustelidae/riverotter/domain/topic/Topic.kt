@@ -1,26 +1,24 @@
 package io.mustelidae.riverotter.domain.topic
 
-import org.bson.types.ObjectId
-import org.springframework.data.annotation.Id
-import org.springframework.data.mongodb.core.mapping.DBRef
-import org.springframework.data.mongodb.core.mapping.Document
-import java.time.LocalDateTime
+import io.mustelidae.riverotter.common.Audit
+import jakarta.persistence.CascadeType
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.Id
+import jakarta.persistence.OneToMany
+import jakarta.persistence.Table
 import java.util.Locale
 
-@Document
+@Entity
+@Table(name = "topic")
 class Topic(
     @Id
-    var id: ObjectId,
+    var id: String,
     val name: String,
-) {
-    var createdAt = LocalDateTime.now()!!
-        protected set
-
-    @DBRef
+) : Audit() {
+    @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     var calendars: MutableList<TopicCalendar> = arrayListOf()
         protected set
-
-    var workSchedule: WorkSchedule? = null
 
     fun addBy(topicCalendar: TopicCalendar) {
         if (hasCalendar(topicCalendar.locale, topicCalendar.year)) {
@@ -28,6 +26,9 @@ class Topic(
         }
 
         calendars.add(topicCalendar)
+        if (this != topicCalendar.topic) {
+            topicCalendar.setBy(this)
+        }
     }
 
     fun hasCalendar(locale: Locale, year: Int): Boolean {
@@ -42,8 +43,6 @@ class Topic(
     fun getCalendar(locale: Locale, year: Int): TopicCalendar? {
         return this.calendars.find { it.locale == locale && it.year == year }
     }
-
-    fun hasWorkSchedule(): Boolean = (workSchedule == null)
 
     companion object
 }

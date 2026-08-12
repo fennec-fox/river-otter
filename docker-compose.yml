@@ -1,7 +1,9 @@
 version: '3.3'
 services:
-  mongo:
-    image: mongo:5.0.5
-    platform: linux/arm64/v8
+  mysql:
+    image: mysql:8.0
     ports:
-      - "27018:27017"
+      - "3307:3306"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: riverOtter

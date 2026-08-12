@@ -7,7 +7,6 @@ import io.mustelidae.riverotter.domain.client.abstractapi.WorldHolidayClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import org.bson.types.ObjectId
 import java.time.LocalDate
 import java.util.Locale
 
@@ -17,10 +16,10 @@ class UnitedStateHoliday(
 ) : CountryHoliday {
     override val localeOfCountry: Locale = Locale.US
 
-    override fun create(year: Int): ObjectId {
+    override fun create(year: Int): Long {
         val holidayCalendar = holidayCalendarRepository.findByYearAndLocale(year, localeOfCountry)
         if (holidayCalendar != null) {
-            return holidayCalendar.id
+            return holidayCalendar.id!!
         }
 
         val weekendHolidays = super.getWeekend(year, false)
@@ -56,7 +55,10 @@ class UnitedStateHoliday(
 
         holidays.sortBy { it.time }
 
-        return holidayCalendarRepository.save(HolidayCalendar(localeOfCountry, year, holidays)).id
+        val calendar = HolidayCalendar(localeOfCountry, year)
+        holidays.forEach { calendar.addBy(it) }
+
+        return holidayCalendarRepository.save(calendar).id!!
     }
 
     private fun getHolidays(locale: Locale, days: List<LocalDate>): List<Holiday> {

@@ -2,17 +2,17 @@ package io.mustelidae.riverotter.domain.topic.synchronization
 
 import io.mustelidae.riverotter.domain.calendar.holiday.Holiday
 import io.mustelidae.riverotter.domain.topic.TopicCalendar
-import io.mustelidae.riverotter.domain.topic.WorkSchedule
+import io.mustelidae.riverotter.domain.topic.TopicWorkSchedule
 import java.time.DayOfWeek
 import java.time.LocalDate
 
 interface TopicHolidaySynchronization {
-    fun syncWorkSchedule(workSchedule: WorkSchedule)
+    fun syncWorkSchedule(workSchedule: TopicWorkSchedule)
     fun syncTopicCalendar(topicCalendar: TopicCalendar)
 
     fun makeHolidayOwingToWorkSchedule(
         date: LocalDate,
-        workSchedule: WorkSchedule,
+        workSchedule: TopicWorkSchedule,
         name: String = "Closed",
     ): Holiday? {
         @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")

@@ -3,7 +3,6 @@ package io.mustelidae.riverotter.domain.topic.api
 import io.kotest.matchers.shouldBe
 import io.mustelidae.riverotter.config.IntegrationSupport
 import io.mustelidae.riverotter.domain.topic.repository.TopicRepository
-import org.bson.types.ObjectId
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
@@ -27,7 +26,7 @@ internal class TopicControllerTest : IntegrationSupport() {
         val id = topicController.add(request).content!!
 
         // Then
-        val savedTopic = topicRepository.findByIdOrNull(ObjectId(id))!!
+        val savedTopic = topicRepository.findByIdOrNull(id)!!
 
         request.name shouldBe savedTopic.name
     }
@@ -44,7 +43,7 @@ internal class TopicControllerTest : IntegrationSupport() {
         topicController.remove(removeId)
 
         // Then
-        val removedTopic = topicRepository.findByIdOrNull(ObjectId(removeId))
+        val removedTopic = topicRepository.findByIdOrNull(removeId)
 
         removedTopic shouldBe null
     }

@@ -1,10 +1,17 @@
 package io.mustelidae.riverotter.domain.topic.repository
 
 import io.mustelidae.riverotter.domain.topic.TopicCalendar
-import org.bson.types.ObjectId
-import org.springframework.data.mongodb.repository.MongoRepository
+import org.springframework.data.jpa.repository.EntityGraph
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.stereotype.Repository
 import java.util.Locale
 
-interface TopicCalendarRepository : MongoRepository<TopicCalendar, ObjectId> {
-    fun findByYearAndLocale(year: Int, locale: Locale)
+@Repository
+interface TopicCalendarRepository : JpaRepository<TopicCalendar, Long> {
+
+    @EntityGraph(attributePaths = ["holidays"])
+    fun findWithHolidaysByTopicIdAndLocaleAndYear(topicId: String, locale: Locale, year: Int): TopicCalendar?
+
+    @EntityGraph(attributePaths = ["workdays"])
+    fun findWithWorkdaysByTopicIdAndLocaleAndYear(topicId: String, locale: Locale, year: Int): TopicCalendar?
 }

@@ -1,7 +1,6 @@
 package io.mustelidae.riverotter.domain.calendar.holiday.country
 
 import io.mustelidae.riverotter.domain.calendar.holiday.Holiday
-import org.bson.types.ObjectId
 import java.time.DayOfWeek.SATURDAY
 import java.time.DayOfWeek.SUNDAY
 import java.time.LocalDate
@@ -10,7 +9,7 @@ import java.util.Locale
 interface CountryHoliday {
     val localeOfCountry: Locale
 
-    fun create(year: Int): ObjectId
+    fun create(year: Int): Long
 
     fun getWeekend(year: Int, saturdayIsHoliday: Boolean): List<Holiday> {
         val startOfYear = LocalDate.of(year, 1, 1)

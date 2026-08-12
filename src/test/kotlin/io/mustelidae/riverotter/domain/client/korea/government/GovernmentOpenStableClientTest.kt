@@ -2,8 +2,10 @@ package io.mustelidae.riverotter.domain.client.korea.government
 
 import io.kotest.matchers.shouldBe
 import io.mustelidae.riverotter.config.AppEnvironment
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
+@Disabled("실제 API 호출 테스트")
 internal class GovernmentOpenStableClientTest {
 
     private val env = AppEnvironment.Client.Government().apply {

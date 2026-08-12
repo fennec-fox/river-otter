@@ -6,7 +6,6 @@ import io.mustelidae.riverotter.domain.calendar.holiday.HolidayCalendar
 import io.mustelidae.riverotter.domain.calendar.holiday.repository.HolidayCalendarRepository
 import io.mustelidae.riverotter.domain.client.korea.government.GovernmentOpenClient
 import io.mustelidae.riverotter.utils.sort
-import org.bson.types.ObjectId
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -21,10 +20,10 @@ class KoreaHoliday(
     private val patternOfLocDate = DateTimeFormatter.ofPattern("yyyyMMdd")
     private val saturdayIsHoliday = korEnv.saturdayIsHoliday
 
-    override fun create(year: Int): ObjectId {
+    override fun create(year: Int): Long {
         val holidayCalendar = holidayCalendarRepository.findByYearAndLocale(year, localeOfCountry)
         if (holidayCalendar != null) {
-            return holidayCalendar.id
+            return holidayCalendar.id!!
         }
 
         val weekendHolidays = super.getWeekend(year, saturdayIsHoliday)
@@ -53,6 +52,9 @@ class KoreaHoliday(
 
         holidays.sort()
 
-        return holidayCalendarRepository.save(HolidayCalendar(localeOfCountry, year, holidays)).id
+        val calendar = HolidayCalendar(localeOfCountry, year)
+        holidays.forEach { calendar.addBy(it) }
+
+        return holidayCalendarRepository.save(calendar).id!!
     }
 }

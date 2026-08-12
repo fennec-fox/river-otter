@@ -7,7 +7,6 @@ import io.mustelidae.riverotter.domain.calendar.holiday.country.UnitedStateHolid
 import io.mustelidae.riverotter.domain.calendar.holiday.repository.HolidayCalendarRepository
 import io.mustelidae.riverotter.domain.client.abstractapi.WorldHolidayClient
 import io.mustelidae.riverotter.domain.client.korea.government.GovernmentOpenClient
-import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import java.util.Locale
 
@@ -18,7 +17,7 @@ class HolidayCrawler(
     private val worldHolidayClient: WorldHolidayClient,
     private val holidayCalendarRepository: HolidayCalendarRepository,
 ) {
-    fun crawling(year: Int, country: Locale): ObjectId {
+    fun crawling(year: Int, country: Locale): Long {
         val countryHoliday = when (country) {
             Locale.KOREA -> KoreaHoliday(env.country.korea, governmentOpenClient, holidayCalendarRepository)
             Locale.US -> UnitedStateHoliday(worldHolidayClient, holidayCalendarRepository)

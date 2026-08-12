@@ -9,7 +9,6 @@ import io.mustelidae.riverotter.utils.toReplies
 import io.mustelidae.riverotter.utils.toReply
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.bson.types.ObjectId
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -31,7 +30,7 @@ class TopicHolidayCalendarController(
         @PathVariable year: Int,
     ): Reply<HolidayCalendarResources.Reply.Calendar> {
         val locale = AvailableCountry.getLocale(country)
-        val calendar = topicHolidayCalendarFinder.findBy(ObjectId(id), locale, year)
+        val calendar = topicHolidayCalendarFinder.findBy(id, locale, year)
 
         return HolidayCalendarResources.Reply.Calendar.from(calendar).toReply()
     }
@@ -45,7 +44,7 @@ class TopicHolidayCalendarController(
         @PathVariable month: Int,
     ): Replies<HolidayCalendarResources.Reply.HolidayOfCountry> {
         val locale = AvailableCountry.getLocale(country)
-        return topicHolidayCalendarFinder.findBy(ObjectId(id), locale, year, month)
+        return topicHolidayCalendarFinder.findBy(id, locale, year, month)
             .map { HolidayCalendarResources.Reply.HolidayOfCountry.from(it, locale) }
             .toReplies()
     }
@@ -60,7 +59,7 @@ class TopicHolidayCalendarController(
         @PathVariable day: Int,
     ): Reply<HolidayCalendarResources.Reply.DayOfHoliday> {
         val locale = AvailableCountry.getLocale(country)
-        val holiday = topicHolidayCalendarFinder.findBy(ObjectId(id), locale, year, month, day)
+        val holiday = topicHolidayCalendarFinder.findBy(id, locale, year, month, day)
 
         val dayOfHoliday = if (holiday == null) {
             HolidayCalendarResources.Reply.DayOfHoliday.fromNotHoliday()

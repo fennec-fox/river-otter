@@ -1,13 +1,14 @@
 package io.mustelidae.riverotter.domain.topic.api
 
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mustelidae.riverotter.common.AvailableCountry
 import io.mustelidae.riverotter.config.IntegrationSupport
 import io.mustelidae.riverotter.domain.topic.Topic
 import io.mustelidae.riverotter.domain.topic.Workday
 import io.mustelidae.riverotter.domain.topic.aFixture
+import io.mustelidae.riverotter.domain.topic.repository.TopicCalendarRepository
 import io.mustelidae.riverotter.domain.topic.repository.TopicRepository
-import org.bson.types.ObjectId
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
@@ -15,8 +16,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestMethodOrder
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -28,16 +29,20 @@ internal class TopicCalendarControllerTest : IntegrationSupport() {
     @Autowired
     private lateinit var topicRepository: TopicRepository
 
+    @Autowired
+    private lateinit var topicCalendarRepository: TopicCalendarRepository
+
     private val country = "KR"
     private val year = 2020
     private val locale = AvailableCountry.getLocale(country)
     private lateinit var topicId: String
+    private lateinit var modifiedAtAfterCreate: LocalDateTime
 
     @BeforeAll()
     fun beforeAll() {
         val topic = Topic.aFixture()
         topicRepository.save(topic)
-        topicId = topic.id.toString()
+        topicId = topic.id
     }
 
     @Test
@@ -53,10 +58,13 @@ internal class TopicCalendarControllerTest : IntegrationSupport() {
         topicCalendarController.addHoliday(topicId, country, request)
 
         // Then
-        val topic = topicRepository.findByIdOrNull(ObjectId(topicId))!!
-        val calendar = topic.getCalendar(locale, year)!!
+        val calendar = topicCalendarRepository.findWithHolidaysByTopicIdAndLocaleAndYear(topicId, locale, year)!!
         calendar.holidays.size shouldBe 1
         calendar.holidays.first().date shouldBe request.date
+        calendar.createdAt shouldNotBe null
+        calendar.modifiedAt shouldNotBe null
+        calendar.auditor shouldBe "unknown"
+        modifiedAtAfterCreate = calendar.modifiedAt!!
     }
 
     @Test
@@ -66,9 +74,11 @@ internal class TopicCalendarControllerTest : IntegrationSupport() {
         topicCalendarController.removeHoliday(topicId, country, date)
 
         // Then
-        val topic = topicRepository.findByIdOrNull(ObjectId(topicId))!!
-        val calendar = topic.getCalendar(locale, year)!!
+        // holidays/workdays live on the mappedBy (child) side, so mutating them never
+        // dirties the topic_calendar row itself, and modifiedAt must stay unchanged.
+        val calendar = topicCalendarRepository.findWithHolidaysByTopicIdAndLocaleAndYear(topicId, locale, year)!!
         calendar.holidays.size shouldBe 0
+        calendar.modifiedAt shouldBe modifiedAtAfterCreate
     }
 
     @Test
@@ -91,8 +101,7 @@ internal class TopicCalendarControllerTest : IntegrationSupport() {
         topicCalendarController.removeWorkday(topicId, country, date)
 
         // Then
-        val topic = topicRepository.findByIdOrNull(ObjectId(topicId))!!
-        val calendar = topic.getCalendar(locale, year)!!
+        val calendar = topicCalendarRepository.findWithWorkdaysByTopicIdAndLocaleAndYear(topicId, locale, year)!!
         calendar.workdays.size shouldBe 0
     }
 }

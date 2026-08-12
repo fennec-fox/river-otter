@@ -2,7 +2,7 @@ package io.mustelidae.riverotter.domain.topic.synchronization
 
 import io.mustelidae.riverotter.domain.calendar.holiday.Holiday
 import io.mustelidae.riverotter.domain.topic.TopicCalendar
-import io.mustelidae.riverotter.domain.topic.WorkSchedule
+import io.mustelidae.riverotter.domain.topic.TopicWorkSchedule
 import java.time.DayOfWeek
 import java.time.LocalDate
 
@@ -12,7 +12,7 @@ class YearTopicHolidaySynchronization(
     private val topicHolidays: MutableMap<LocalDate, Holiday> = countryHoliday.associateBy { it.date }.toMutableMap()
     private val year: Int = countryHoliday.first().date.year
 
-    override fun syncWorkSchedule(workSchedule: WorkSchedule) {
+    override fun syncWorkSchedule(workSchedule: TopicWorkSchedule) {
         val dates = LocalDate.of(year, 1, 1).datesUntil(LocalDate.of(year, 12, 31))
             .toList()
 
@@ -37,7 +37,7 @@ class YearTopicHolidaySynchronization(
     override fun syncTopicCalendar(topicCalendar: TopicCalendar) {
         // Add holiday
         topicHolidays.putAll(
-            topicCalendar.holidays.associateBy { it.date },
+            topicCalendar.holidays.associate { it.date to it.toHoliday() },
         )
 
         // All days on which a topic works are removed from holidays.

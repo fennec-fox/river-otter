@@ -51,19 +51,18 @@ var project: Project? = null
 
 조회 시점에 실제로 필요한 데이터는 LAZY 프록시에 의존하지 말고, `*DSLRepository`에서 fetch join으로 명시적으로 가져온다 (아래 QueryDSL 절 참고).
 
-### `@OneToMany` — `mappedBy` + `LAZY` 필수, `cascade`에 `REMOVE`를 넣지 않는다
+### `@OneToMany` — `mappedBy` + `LAZY` 필수, `cascade = [CascadeType.ALL]`로 하드 삭제를 명시적으로 전파한다
 
 - FK는 항상 자식 쪽(`@ManyToOne`)이 소유한다. N:M 관계도 `@ManyToMany` 대신 별도 조인 Entity(아래 항목)로 명시적으로 분리하고, `@OneToMany(mappedBy = "...")`로 연결한다.
 - `fetch = FetchType.LAZY`를 명시한다.
-- 이 프로젝트는 실제 삭제 없이 `status = false` soft delete만 쓴다. `cascade`에 `CascadeType.REMOVE`(또는 `ALL`)를 넣으면, 실수로 부모 Entity에 `repository.delete()`가 호출됐을 때 하위 Entity가 실제로 DB에서 지워진다. **`cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH]`만 사용하고 `REMOVE`/`ALL`은 쓰지 않는다.**
-- soft delete 대상 컬렉션에는 `@SQLRestriction("status = true")`를 붙여 만료된 row를 자동으로 제외한다.
+- 이 프로젝트는 soft delete를 쓰지 않고 `repository.delete()`/`deleteById()`로 실제 삭제한다 (soft delete는 "삭제 후 같은 자연키로 재등록" 시나리오가 UNIQUE 제약과 충돌하는 문제 때문에 도입하지 않기로 함 — 재등록 시 soft-deleted row는 애플리케이션 레벨 중복 체크는 통과하지만 DB의 UNIQUE 제약에는 그대로 걸린다). 따라서 `cascade = [CascadeType.ALL]`을 의도적으로 사용해, 부모 Entity에 `repository.delete()`가 호출되면 하위 Entity도 함께 DB에서 삭제되도록 한다. `HolidayCalendar.holidays`, `Topic.calendars`, `TopicCalendar.holidays`/`workdays`가 이 패턴이다.
+- Flyway 마이그레이션(`V1__init_schema.sql`)의 FK 제약에도 동일하게 `ON DELETE CASCADE`가 걸려 있어, 애플리케이션 cascade와 DB 레벨 cascade가 함께 정합성을 보장한다.
 
 ```kotlin
-@SQLRestriction("status = true")
 @OneToMany(
     mappedBy = "foo",
     fetch = FetchType.LAZY,
-    cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH],
+    cascade = [CascadeType.ALL],
 )
 var bars: MutableList<Bar> = arrayListOf()
     protected set
@@ -74,14 +73,14 @@ var bars: MutableList<Bar> = arrayListOf()
 `@ManyToMany`는 사용하지 않는다. 대신 두 Entity를 각각 `@ManyToOne(fetch = LAZY)`로 참조하는 별도 Entity를 만든다.
 
 - 양쪽에 `@JoinColumn(updatable = false, nullable = false)`를 붙인다 (연결은 생성 시 한 번만 맺고 변경하지 않음을 명시).
-- `status` 필드 + `expire()` 메서드로 soft delete를 지원한다.
+- 조인 Entity 자체가 연결/해제 이력을 표현하므로, 해제는 `status` 필드 + `expire()` 메서드로 soft delete한다 (조인 Entity를 지워도 양쪽 원본 Entity에는 영향이 없어 UNIQUE 제약 충돌 문제가 없다).
 - `setBy(A)`, `setBy(B)` 두 개의 오버로드로 양쪽 부모와 각각 동기화한다.
 
-이 패턴은 `UserAuthorityGrant`(User↔AuthorityDefinition), `UserPersonalGrant`(User↔MenuNavigation), `AuthorityNavigationUnit`(AuthorityDefinition↔MenuNavigation)에서 확인할 수 있다.
+이 패턴은 예시일 뿐, 현재 river-otter에는 N:M 관계나 이를 구현한 조인 Entity가 존재하지 않는다 (`calendar`/`topic`/`workingday`/`client` 도메인 어디에도 없음). 실제로 N:M 관계를 추가할 때 참고할 패턴으로 남겨둔다.
 
 ### 상태 필드(`status`) 캡슐화
 
-Soft delete용 `status` 필드는 `protected set`으로 캡슐화하고, 값 변경은 반드시 `expire()` 같은 의도가 드러나는 Entity 메서드를 통해서만 한다. `var status = true`처럼 외부에서 직접 대입 가능한 형태로 두지 않는다.
+위 N:M 조인 Entity처럼 soft delete를 쓰는 경우에 한해, `status` 필드는 `protected set`으로 캡슐화하고 값 변경은 반드시 `expire()` 같은 의도가 드러나는 Entity 메서드를 통해서만 한다. `var status = true`처럼 외부에서 직접 대입 가능한 형태로 두지 않는다. river-otter의 기존 Entity(`Holiday`, `Topic` 등)는 soft delete를 쓰지 않으므로 `status` 필드가 없다 — 위 `@OneToMany`/`cascade` 절 참고.
 
 ---
 
